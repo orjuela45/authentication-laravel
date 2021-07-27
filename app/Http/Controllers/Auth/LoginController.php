@@ -46,11 +46,8 @@ class LoginController extends Controller
     }
 
     public function handleMicrosoftCallback(){
-        $data = Socialite::driver('microsoft')->user();
-        $user = new User();
-        $user->name = $data->name;
-        $user->email = $data->email;
-        Auth::login($user);
+        $data = Socialite::driver('microsoft')->user();     
+        $this->_registerOrLoginUser($data);
         return redirect()->route('home');        
     }
 
@@ -59,11 +56,8 @@ class LoginController extends Controller
     }
 
     public function handleGoogleCallback(){
-        $data = Socialite::driver('google')->user();     
-        $user = new User();
-        $user->name = $data->name;
-        $user->email = $data->email;
-        Auth::login($user);
+        $data = Socialite::driver('google')->user();      
+        $this->_registerOrLoginUser($data);
         return redirect()->route('home');    
     }
 
@@ -73,10 +67,21 @@ class LoginController extends Controller
 
     public function handleOrcidCallback(){
         $data = Socialite::driver('orcid')->user();     
-        $user = new User();
-        $user->name = $data->name;
-        $user->email = $data->email;
-        Auth::login($user);
+        $this->_registerOrLoginUser($data);
         return redirect()->route('home');       
+    }
+
+    public function _registerOrLoginUser($data){
+        $user = User::where('email', '=', $data->email)->first();
+        if (!$user){
+            $user = new User();
+            $user->name = $data->name;
+            $user->email = $data->email;
+            $user->provider_id = $data->id;
+            $user->name = $data->name;
+            $user->save();
+        }
+
+        Auth::login($user);
     }
 }
