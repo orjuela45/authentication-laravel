@@ -74,4 +74,9 @@
         </main>
     </div>
 </body>
+<style>
+    body {
+        background-image: url({{url('img/background.jpg')}})
+    }
+</style>
 </html>
